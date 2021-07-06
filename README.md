@@ -32,18 +32,18 @@ Note: the summary for document with ID "GO2jfXoBbx-yxGP8Hyrb" differs from its t
 ## Files In This Repo
 
 * Setup
-    * README.md -- this file
-    * docker-compose.yml -- used by `docker compose up` to setup a basic elasticsearch service and encrypted search proxy that can talk to each other
-    * populate_index.sh -- will add the 1000 sample wikipedia articles to the search server and encrypt the titles of ones with tenant_ids
-    * try-encrypta-conf.yml -- specifies the fields to encrypt and is mounted into the search proxy's container
-    * wikipedia-articles-1000-1.json -- the source for the documents populated into the index
+    * **README.md** -- this file
+    * **docker-compose.yml** -- used by `docker compose up` to setup a basic elasticsearch service and encrypted search proxy that can talk to each other
+    * **populate_index.sh** -- will add the 1000 sample wikipedia articles to the search server and encrypt the titles of ones with tenant_ids
+    * **try-encrypta-conf.yml** -- specifies the fields to encrypt and is mounted into the search proxy's container
+    * **wikipedia-articles-1000-1.json** -- the source for the documents populated into the index
 * Querying
-    * query_encrypted_docs.sh -- will set the tenant-id to 1 and pass through queries with title fields encrypted
-    * query_unencrypted_docs.sh -- will set the tenant-id to anything but tenant-1; queries not encrypted
-    * peek_index.sh -- will query elasticsearch directly so you can see the what's stored
-    * query.sh -- building block for the above and may be used to make advanced queries
+    * **query_encrypted_docs.sh** -- will set the tenant-id to 1 and pass through queries with title fields encrypted
+    * **query_unencrypted_docs.sh** -- will set the tenant-id to anything but tenant-1; queries not encrypted
+    * **peek_index.sh** -- will query elasticsearch directly so you can see the what's stored
+    * **query.sh** -- building block for the above and may be used to make advanced queries
 * Cleanup
-    * delete_index.sh -- will reset the search service to remove the index (restarting the containers will do the same, but this is faster)
+    * **delete_index.sh** -- will reset the search service to remove the index (restarting the containers will do the same, but this is faster)
 
 ## Next Steps
 

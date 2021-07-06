@@ -1,0 +1,20 @@
+version: "3.8"
+services:
+  elasticsearch:
+    image: "docker.elastic.co/elasticsearch/elasticsearch:7.13.2"
+    ports:
+      - 9200:9200
+    environment:
+      ES_JAVA_OPTS: "-Xmx1G"
+      discovery.type: "single-node"
+  encrypta:
+    image: "gcr.io/ironcore-dev-1/encrypta:latest"
+    ports:
+      - 8675:8675
+    configs:
+      - source: try_encrypta
+        target: "/app/deploy.yml"
+        mode: 0440
+configs:
+  try_encrypta:
+    file: "./try-encrypta-conf.yml"

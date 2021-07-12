@@ -21,10 +21,10 @@ if [ -z "$PORT" ] ; then
 fi
 
 echo "Query being made:"
-echo "curl -s -G --data-urlencode \"q=$1\" \"localhost:$PORT/try_encrypta/_search?size=1000\""
+echo "curl -s -G --data-urlencode \"q=$1\" \"localhost:$PORT/try_cloaked-search/_search?size=1000\""
 
 if type jq >/dev/null 2>&1 ; then
-  curl -s -G --data-urlencode "q=$1" "localhost:$PORT/try_encrypta/_search?size=1000" | jq 
+  curl -s -G --data-urlencode "q=$1" "localhost:$PORT/try_cloaked-search/_search?size=1000" | jq 
 else
-  curl -s -G --data-urlencode "q=$1" "localhost:$PORT/try_encrypta/_search?size=1000&pretty"
+  curl -s -G --data-urlencode "q=$1" "localhost:$PORT/try_cloaked-search/_search?size=1000&pretty"
 fi

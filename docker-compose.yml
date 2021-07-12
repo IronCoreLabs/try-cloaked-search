@@ -7,14 +7,14 @@ services:
     environment:
       ES_JAVA_OPTS: "-Xmx1G"
       discovery.type: "single-node"
-  encrypta:
-    image: "gcr.io/ironcore-dev-1/encrypta:latest"
+  cloaked-search:
+    image: "gcr.io/ironcore-dev-1/cloaked-search:latest"
     ports:
       - 8675:8675
     configs:
-      - source: try_encrypta
+      - source: try_cloaked-search
         target: "/app/deploy.yml"
         mode: 0440
 configs:
-  try_encrypta:
-    file: "./try-encrypta-conf.yml"
+  try_cloaked-search:
+    file: "./try-cloaked-search-conf.yml"

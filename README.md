@@ -1,6 +1,6 @@
 # Try Encrypted Search
 
-Please see the getting started steps and explanations at https://ironcorelabs.com/docs/saas-shield/encrypta/try-encrypta/
+Please see the getting started steps and explanations at https://ironcorelabs.com/docs/saas-shield/cloaked-search/try-cloaked-search/
 
 ## Quick Start for the Impatient
 
@@ -35,7 +35,7 @@ Note: the summary for document with ID "GO2jfXoBbx-yxGP8Hyrb" differs from its t
     * **README.md** -- this file
     * **docker-compose.yml** -- used by `docker compose up` to setup a basic elasticsearch service and encrypted search proxy that can talk to each other
     * **populate_index.sh** -- will add the 1000 sample wikipedia articles to the search server and encrypt the titles of ones with tenant_ids
-    * **try-encrypta-conf.yml** -- specifies the fields to encrypt and is mounted into the search proxy's container
+    * **try-cloaked-search-conf.yml** -- specifies the fields to encrypt and is mounted into the search proxy's container
     * **wikipedia-articles-1000-1.json** -- the source for the documents populated into the index
 * Querying
     * **query_encrypted_docs.sh** -- will set the tenant-id to 1 and pass through queries with title fields encrypted

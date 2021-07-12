@@ -4,6 +4,6 @@ standalone_keys:
       key: 60e0787286bf350ec4db6a89c54efea38d09238ac80fc9a1401c0291f96bd1ee
       primary: true
 indices:
-    - name: try_encrypta
+    - name: try_cloaked-search
       fields:
           - name: title

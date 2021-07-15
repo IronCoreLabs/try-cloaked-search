@@ -1,4 +1,4 @@
-# Try Encrypted Search
+# Try Cloaked Search
 
 Please see the getting started steps and explanations at https://ironcorelabs.com/docs/saas-shield/cloaked-search/try-cloaked-search/
 
@@ -52,4 +52,3 @@ Note: the summary for document with ID "GO2jfXoBbx-yxGP8Hyrb" differs from its t
 * Encrypt more fields
 * Add more tenants
 * Give us feedback, make feature requests, or report bugs by adding an issue in our Github
-

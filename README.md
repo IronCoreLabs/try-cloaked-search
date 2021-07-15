@@ -16,13 +16,13 @@ To try Cloaked Search you just need a basic *nix installation and `docker` + `do
 
 ## Get Cloaked Search Running
 
-Check out the [try-cloaked-search](https://github.com/IronCoreLabs/try-cloaked-search) git repo.
+Clone the [try-cloaked-search](https://github.com/IronCoreLabs/try-cloaked-search) git repo.
 
 ```bash
 git clone https://github.com/IronCoreLabs/try-cloaked-search.git
 ```
 
-All other commands are assumed be run from within this checkout.
+All other commands are assumed be run from within the cloned repo.
 
 ### Start Cloaked Search and Elasticsearch
 

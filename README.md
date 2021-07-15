@@ -7,7 +7,7 @@ Please see the getting started steps and explanations at https://ironcorelabs.co
 Get things started by running the following two commands from this repo's directory but in separate terminal windows:
 
 ```
-docker compose up
+docker-compose up
 ./populate_index.sh
 ```
 

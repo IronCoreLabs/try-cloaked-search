@@ -1,4 +1,4 @@
-## Try Cloaked Search (in ~5 Minutes)
+# Try Cloaked Search (in ~5 Minutes)
 
 Cloaked Search is a proxy for Elasticsearch that protects the indexed data from prying eyes. Cloaked Search's API is the same as the underlying Elasticsearch API.
 

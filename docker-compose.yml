@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.3"
 services:
   elasticsearch:
     image: "docker.elastic.co/elasticsearch/elasticsearch:7.13.2"
@@ -8,13 +8,10 @@ services:
       ES_JAVA_OPTS: "-Xmx1G"
       discovery.type: "single-node"
   cloaked-search:
-    image: "gcr.io/ironcore-dev-1/cloaked-search:latest"
+    image: "gcr.io/ironcore-images/cloaked-search:latest"
     ports:
       - 8675:8675
-    configs:
-      - source: try_cloaked-search
-        target: "/app/deploy.yml"
-        mode: 0440
-configs:
-  try_cloaked-search:
-    file: "./try-cloaked-search-conf.yml"
+    volumes:
+      - type: bind
+        source: ./try-cloaked-search-conf.yml
+        target: /app/deploy.yml

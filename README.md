@@ -12,7 +12,7 @@ All stored data is on a temporary volume inside of docker. No changes will be ma
 
 ## Dependencies
 
-To try Cloaked Search you just need a basic *nix installation and docker. Some of the commands below also use `jq` for JSON formatting. If you don't have `jq`, you can safely remove those portions of the command.
+To try Cloaked Search you just need a basic *nix installation and `docker` + `docker-compose`. Some of the commands below also use `jq` for JSON formatting. If you don't have `jq`, you can safely remove those portions of the command.
 
 ## Get Cloaked Search Running
 

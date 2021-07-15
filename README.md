@@ -26,6 +26,8 @@ All other commands are assumed be run from within the cloned repo.
 
 ### Start Cloaked Search and Elasticsearch
 
+_Note: This example install uses ports 9200 (Elasticsearch) and 8675 (Cloaked Search). Be sure you don't have an existing Elasticsearch running on port 9200 before beginning._
+
 ```bash
 docker-compose up
 ```

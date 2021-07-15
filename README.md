@@ -1,54 +1,89 @@
-# Try Cloaked Search
+## Try Cloaked Search (in ~5 Minutes)
 
-Please see the getting started steps and explanations at https://ironcorelabs.com/docs/saas-shield/cloaked-search/try-cloaked-search/
+Cloaked Search is a proxy for Elasticsearch that protects the indexed data from prying eyes. Cloaked Search's API is the same as the underlying Elasticsearch API.
 
-## Quick Start for the Impatient
+In about 5 minutes, you will have:
+* Elasticsearch running on your local machine
+* Cloaked Search running on your local machine
+* sample data indexed with `title` as a protected field
+* query results from sample queries using the protected `title` field
 
-Get things started by running the following two commands from this repo's directory but in separate terminal windows:
+All stored data is on a temporary volume inside of docker. No changes will be made your machine beyond `try-cloaked-search` repo.
 
+## Dependencies
+
+To try Cloaked Search you just need a basic *nix installation and docker. Some of the commands below also use `jq` for JSON formatting. If you don't have `jq`, you can safely remove those portions of the command.
+
+## Get Cloaked Search Running
+
+Check out the [try-cloaked-search](https://github.com/IronCoreLabs/try-encrypted-search) git repo.
+
+```bash
+git clone https://github.com/IronCoreLabs/try-encrypted-search.git
 ```
+
+All other commands are assumed be run from within this checkout.
+
+### Start Cloaked Search and Elasticsearch
+
+```bash
 docker-compose up
-./populate_index.sh
 ```
 
-Then play with the shell scripts to see what happens with commands like this:
+**Note: Future commands will be targeting Cloaked Search on port 8675**
 
-```
-# View the encrypted fields with "cup" in the title
-./query_encrypted_docs.sh title:cup |grep title.:
+## Indexing
 
-# View the unencrypted fields with "cup" in the title
-./query_unencrypted_docs.sh title:cup |grep title.:
+`try-cloaked-search` includes some test data. Since Cloaked Search uses a different key per (tenant, index, field), documents with protected fields must be tagged with the tenant they belong to. Half of the articles in the test dataset are associated with `tenant-1`, and the other half are not associated with any tenant. Only documents belonging to `tenant-1` will be encrypted. To better understand Cloaked Search's key management, refer to the [configuration documentation](/docs/saas-shield/cloaked-search/configuration).
 
-# View unencrypted docs directly from elasticsearch
-./peek_index.sh title:cup |grep title.:
-
-# View mix of encrypted and unencrypted docs directly from elasticsearch
-./peek_index.sh summary:cup |grep title.:
+```bash
+./populate-index.sh
 ```
 
-Note: the summary for document with ID "GO2jfXoBbx-yxGP8Hyrb" differs from its title and doesn't have the word "cup" in it ("1989 Women's European Cricket" without the trailing "Cup" on the end), which is why that result doesn't show up when peeking in the index and searching by the summary field.
+### (optional) Look at an encrypted index
 
-## Files In This Repo
+_Note that we are making this request directly to Elasticsearch (port 9200) so we can see what's actually stored._
 
-* Setup
-    * **README.md** -- this file
-    * **docker-compose.yml** -- used by `docker compose up` to setup a basic elasticsearch service and encrypted search proxy that can talk to each other
-    * **populate_index.sh** -- will add the 1000 sample wikipedia articles to the search server and encrypt the titles of ones with tenant_ids
-    * **try-cloaked-search-conf.yml** -- specifies the fields to encrypt and is mounted into the search proxy's container
-    * **wikipedia-articles-1000-1.json** -- the source for the documents populated into the index
-* Querying
-    * **query_encrypted_docs.sh** -- will set the tenant-id to 1 and pass through queries with title fields encrypted
-    * **query_unencrypted_docs.sh** -- will set the tenant-id to anything but tenant-1; queries not encrypted
-    * **peek_index.sh** -- will query elasticsearch directly so you can see the what's stored
-    * **query.sh** -- building block for the above and may be used to make advanced queries
-* Cleanup
-    * **delete_index.sh** -- will reset the search service to remove the index (restarting the containers will do the same, but this is faster)
+Let's get all the documents belonging to `tenant-1` and see what's in the index!
+
+```bash
+curl -s -G --data-urlencode "q=tenant_id:\"tenant-1\"" localhost:9200/try_cloaked_search/_search | jq
+```
+
+We are protecting the `title` field from the original document. `title` is no longer attached to the document, and the blind tokens for `title` are stored in a `protected_title` field. You will also notice an `_encrypted_source` field that allows Cloaked Search to return the original versions of any protected fields.
+
+```
+"protected_title": "994F058B 4FDFCA73 3EDFFA5E A8BE4DB0 91518C0A",
+```
+
+The data not associated with any tenant is readable in the clear. If we do a very generic query, some documents with no tenant will come back.
+
+```bash
+curl -s -G --data-urlencode "q=title:list" localhost:9200/try_cloaked_search/_search | jq
+```
+
+## Querying Protected Fields
+
+### Sample Queries
+
+```bash
+curl -s -G --data-urlencode "q=tenant_id:\"tenant-1\" AND title:Japan" localhost:8675/try_cloaked_search/_search | jq
+```
+
+```bash
+curl -s -G --data-urlencode "q=tenant_id:\"tenant-1\" AND title:cup" localhost:8675/try_cloaked_search/_search | jq
+```
+
+```bash
+curl -s -G --data-urlencode "q=tenant_id:\"tenant-1\" AND (title:cup OR title:Japan)" localhost:8675/try_cloaked_search/_search | jq
+```
+
+You can replace the query with anything you like. Make sure you leave the `tenant_id` portion.
+We currently support a subset of Elasticsearch's query language, but are continuing to add support. 
 
 ## Next Steps
+You will want to try out Cloaked Search on some of your own data in a more real environment.
 
-* Play with the curl commands directly
-* Use your own data source
-* Encrypt more fields
-* Add more tenants
-* Give us feedback, make feature requests, or report bugs by adding an issue in our Github
+See the [configuration docs](/docs/saas-shield/cloaked-search/configuration) for info on how to configure and deploy Cloaked Search.
+
+If you are interested in the underlying technology, or the security of the underlying Elasticsearch index, see the [What Is Encrypted Search](../what-is-encrypted-search/) page.

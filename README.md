@@ -86,6 +86,6 @@ We currently support a subset of Elasticsearch's query language, but are continu
 ## Next Steps
 You will want to try out Cloaked Search on some of your own data in a more real environment.
 
-See the [configuration docs](/docs/saas-shield/cloaked-search/configuration) for info on how to configure and deploy Cloaked Search.
+See the [configuration docs](https://ironcorelabs.com/docs/saas-shield/cloaked-search/configuration/) for info on how to configure and deploy Cloaked Search.
 
-If you are interested in the underlying technology, or the security of the underlying Elasticsearch index, see the [What Is Encrypted Search](../what-is-encrypted-search/) page.
+If you are interested in the underlying technology, or the security of the underlying Elasticsearch index, see the [What Is Encrypted Search](https://ironcorelabs.com/docs/saas-shield/cloaked-search/what-is-encrypted-search/) page.

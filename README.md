@@ -16,10 +16,10 @@ To try Cloaked Search you just need a basic *nix installation and docker. Some o
 
 ## Get Cloaked Search Running
 
-Check out the [try-cloaked-search](https://github.com/IronCoreLabs/try-encrypted-search) git repo.
+Check out the [try-cloaked-search](https://github.com/IronCoreLabs/try-cloaked-search) git repo.
 
 ```bash
-git clone https://github.com/IronCoreLabs/try-encrypted-search.git
+git clone https://github.com/IronCoreLabs/try-cloaked-search.git
 ```
 
 All other commands are assumed be run from within this checkout.
@@ -37,7 +37,7 @@ docker-compose up
 `try-cloaked-search` includes some test data. Since Cloaked Search uses a different key per (tenant, index, field), documents with protected fields must be tagged with the tenant they belong to. Half of the articles in the test dataset are associated with `tenant-1`, and the other half are not associated with any tenant. Only documents belonging to `tenant-1` will be encrypted. To better understand Cloaked Search's key management, refer to the [configuration documentation](/docs/saas-shield/cloaked-search/configuration).
 
 ```bash
-./populate-index.sh
+./populate_index.sh
 ```
 
 ### (optional) Look at an encrypted index

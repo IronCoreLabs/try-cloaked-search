@@ -49,7 +49,7 @@ _Note that we are making this request directly to Elasticsearch (port 9200) so w
 Let's get all the documents belonging to `tenant-1` and see what's in the index!
 
 ```bash
-curl -s -G --data-urlencode "q=tenant_id:\"tenant-1\"" localhost:9200/try_cloaked_search/_search | jq
+curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\"" localhost:9200/try_cloaked_search/_search | jq
 ```
 
 We are protecting the `title` field from the original document. `title` is no longer attached to the document, and the blind tokens for `title` are stored in a `protected_title` field. You will also notice an `_encrypted_source` field that allows Cloaked Search to return the original versions of any protected fields.
@@ -69,15 +69,15 @@ curl -s -G --data-urlencode "q=title:list" localhost:9200/try_cloaked_search/_se
 ### Sample Queries
 
 ```bash
-curl -s -G --data-urlencode "q=tenant_id:\"tenant-1\" AND title:Japan" localhost:8675/try_cloaked_search/_search | jq
+curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND title:Japan" localhost:8675/try_cloaked_search/_search | jq
 ```
 
 ```bash
-curl -s -G --data-urlencode "q=tenant_id:\"tenant-1\" AND title:cup" localhost:8675/try_cloaked_search/_search | jq
+curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND title:cup" localhost:8675/try_cloaked_search/_search | jq
 ```
 
 ```bash
-curl -s -G --data-urlencode "q=tenant_id:\"tenant-1\" AND (title:cup OR title:Japan)" localhost:8675/try_cloaked_search/_search | jq
+curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND (title:cup OR title:Japan)" localhost:8675/try_cloaked_search/_search | jq
 ```
 
 You can replace the query with anything you like. Make sure you leave the `tenant_id` portion.

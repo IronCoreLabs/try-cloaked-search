@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloaked-search
+spec:
+  selector:
+    matchLabels:
+      app: cloaked-search
+  template:
+    metadata:
+      labels:
+        app: cloaked-search
+    spec:
+      containers:
+      - name: cloaked-search
+        image: cloaked-search-placeholder
+        env:
+          - name: RUST_LOG
+            value: info
+        resources:
+          limits:
+            memory: 500Mi
+            cpu: 2
+        ports:
+          - containerPort: 8675
+            name: http
+        readinessProbe:
+          httpGet:
+            path: /_cluster/health?wait_for_status=green
+            port: http
+        securityContext:
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1001
+        volumeMounts:
+          - name: config
+            mountPath: /app/deploy.yml
+            subPath: deploy.yml
+      securityContext:
+        fsGroup: 1001
+      volumes:
+        - name: config
+          secret:
+            secretName: cloaked-search

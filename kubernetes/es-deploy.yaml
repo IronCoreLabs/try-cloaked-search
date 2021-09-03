@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elastic-search
+spec:
+  selector:
+    matchLabels:
+      app: elastic-search
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+  template:
+    metadata:
+      labels:
+        app: elastic-search
+    spec:
+      containers:
+      - name: elastic-search
+        image: elasticsearch-placeholder
+        env:
+          - name: discovery.type
+            value: single-node
+        resources:
+          limits:
+            memory: 1Gi
+            cpu: 2
+        ports:
+          - containerPort: 9200
+            name: http
+          - containerPort: 9300
+        livenessProbe:
+          httpGet:
+            path: /_cluster/health?wait_for_status=yellow
+            port: http
+        readinessProbe:
+          httpGet:
+            path: /_cluster/health?wait_for_status=green
+            port: http
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+        volumeMounts:
+          - name: data
+            mountPath: /usr/share/elasticsearch/data
+      securityContext:
+        fsGroup: 1000
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: elasticsearch

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloaked-search
+spec:
+  selector:
+    app: cloaked-search
+  ports:
+    - port: 8675
+      name: http

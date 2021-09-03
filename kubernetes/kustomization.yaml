@@ -13,8 +13,8 @@ resources:
 
 images:
 - name: cloaked-search-placeholder
-  newName: gcr.io/ironcore-dev-1/cloaked-search
-  newTag: 0.1.61
+  newName: gcr.io/ironcore-images/cloaked-search
+  newTag: 0.1.48
 - name: elasticsearch-placeholder
   newName: elasticsearch
   newTag: 7.14.0

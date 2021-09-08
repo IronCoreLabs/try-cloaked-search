@@ -36,7 +36,7 @@ docker-compose up
 
 ## Indexing
 
-`try-cloaked-search` includes some test data. Since Cloaked Search uses a different key per (tenant, index, field), documents with protected fields must be tagged with the tenant they belong to. Half of the articles in the test dataset are associated with `tenant-1`, and the other half are not associated with any tenant. Only documents belonging to `tenant-1` will be encrypted. To better understand Cloaked Search's key management, refer to the [configuration documentation](/docs/saas-shield/cloaked-search/configuration).
+`try-cloaked-search` includes some test data. Since Cloaked Search uses a different key per (tenant, index, field), documents with protected fields must be tagged with the tenant they belong to. Half of the articles in the test dataset are associated with `tenant-1`, and the other half are not associated with any tenant. Only documents belonging to `tenant-1` will be encrypted. To better understand Cloaked Search's key management, refer to the [configuration documentation](https://ironcorelabs.com/docs/saas-shield/cloaked-search/configuration).
 
 ```bash
 ./populate_index.sh

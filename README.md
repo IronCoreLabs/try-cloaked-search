@@ -3,16 +3,17 @@
 Cloaked Search is a proxy for Elasticsearch that protects the indexed data from prying eyes. Cloaked Search's API is the same as the underlying Elasticsearch API.
 
 In about 5 minutes, you will have:
-* Elasticsearch running on your local machine
-* Cloaked Search running on your local machine
-* sample data indexed with `title` as a protected field
-* query results from sample queries using the protected `title` field
+
+- Elasticsearch running on your local machine
+- Cloaked Search running on your local machine
+- sample data indexed with `title` as a protected field
+- query results from sample queries using the protected `title` field
 
 All stored data is on a temporary volume inside of docker. No changes will be made your machine beyond `try-cloaked-search` repo.
 
 ## Dependencies
 
-To try Cloaked Search you just need a basic *nix installation and `docker` + `docker-compose`. Some of the commands below also use `jq` for JSON formatting. If you don't have `jq`, you can safely remove those portions of the command.
+To try Cloaked Search you just need a basic \*nix installation and `docker` + `docker-compose`. Some of the commands below also use `jq` for JSON formatting. If you don't have `jq`, you can safely remove those portions of the command.
 
 ## Get Cloaked Search Running
 
@@ -68,6 +69,8 @@ curl -s -G --data-urlencode "q=title:list" localhost:9200/try_cloaked_search/_se
 
 ### Sample Queries
 
+These are a couple examples of simple term queries:
+
 ```bash
 curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND title:Japan" localhost:8675/try_cloaked_search/_search | jq
 ```
@@ -76,14 +79,29 @@ curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND title:Japan" localhos
 curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND title:cup" localhost:8675/try_cloaked_search/_search | jq
 ```
 
+Term queries can also be combined with ORs or ANDs like this:
+
 ```bash
 curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND (title:cup OR title:Japan)" localhost:8675/try_cloaked_search/_search | jq
 ```
 
+Phrases can also be searched using quoted queries like this:
+
+```bash
+curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND title:\"Cheerleading in Japan\"" localhost:8675/try_cloaked_search/_search | jq
+```
+
+Finally, here is an example of a prefix query:
+
+```bash
+curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND title:list*" localhost:8675/try_cloaked_search/_search | jq
+```
+
 You can replace the query with anything you like. Make sure you leave the `tenant_id` portion.
-We currently support a subset of Elasticsearch's query language, but are continuing to add support. 
+We currently support a subset of Elasticsearch's query language, but are continuing to add support.
 
 ## Next Steps
+
 You will want to try out Cloaked Search on some of your own data in a more real environment.
 
 Use the [Kubernetes template](kubernetes) in this repository to make a simple Kubernetes deployment.

@@ -69,7 +69,7 @@ curl -s -G --data-urlencode "q=title:list" localhost:9200/try_cloaked_search/_se
 
 ### Sample Queries
 
-This is a couple examples of simple term queries:
+These are a couple examples of simple term queries:
 
 ```bash
 curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND title:Japan" localhost:8675/try_cloaked_search/_search | jq

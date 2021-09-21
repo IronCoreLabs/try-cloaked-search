@@ -36,9 +36,14 @@ spec:
           - name: config
             mountPath: /app/deploy.yml
             subPath: deploy.yml
+          - name: keys
+            mountPath: /secrets/cloaked-search
       securityContext:
         fsGroup: 1001
       volumes:
         - name: config
+          configMap:
+            name: cloaked-search
+        - name: keys
           secret:
             secretName: cloaked-search

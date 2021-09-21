@@ -21,9 +21,9 @@ purposes, not production.
 
 # Deploy
 
-1. `kubectl create secret generic cloaked-search --from-file=../try-cloaked-search-conf.yaml=deploy.yml -n cloaked-search` to create
-    the Kubernetes secret containing the config file. (If the `cloaked-search` namespace doesn't exist yet, create it with
-    `kubectl create ns cloaked-search`.)
+Examine the config file in `config/deploy.yml` and make changes if desired. The standalone keys referenced in this file are defined
+in `kustomization.yaml`, in the `secretGenerator` stanza.
+
 1. Use `kubectl apply -k .` in this directory to start everything up.
 
 # Store documents

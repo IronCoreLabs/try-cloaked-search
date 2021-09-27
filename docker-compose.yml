@@ -8,10 +8,13 @@ services:
       ES_JAVA_OPTS: "-Xmx1G"
       discovery.type: "single-node"
   cloaked-search:
-    image: "gcr.io/ironcore-images/cloaked-search:0.3.0"
+    image: "gcr.io/ironcore-images/cloaked-search:0.4.0"
     ports:
       - 8675:8675
     volumes:
       - type: bind
         source: ./try-cloaked-search-conf.yml
         target: /app/deploy.yml
+      - type: bind
+        source: ./test-key
+        target: /secrets/cloaked-search/key1

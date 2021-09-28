@@ -6,7 +6,15 @@ standalone_keys:
 indices:
   - name: try_cloaked_search
     fields:
-      - name: title
+      - name: body
+        analyzer:
+          tokenizer: default
+          filters:
+            - lowercase
+            - terms
+            - phrases
+            - substring
+      - name: summary
         analyzer:
           tokenizer: default
           filters:

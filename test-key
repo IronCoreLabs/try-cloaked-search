@@ -1,0 +1,4 @@
+standalone_keys:
+  - id: primary-key
+    keypath: /secrets/cloaked-search/key1
+    primary: true

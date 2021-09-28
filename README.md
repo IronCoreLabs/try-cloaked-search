@@ -40,7 +40,8 @@ docker-compose up
 `try-cloaked-search` includes some test data. Since Cloaked Search uses a different key per (tenant, index, field),
 documents with protected fields must be tagged with the tenant to which they belong.
 Half of the articles in the test dataset are associated with `tenant-1`, and the other half are not associated with any tenant.
-Only documents belonging to `tenant-1` will be encrypted. To better understand Cloaked Search's key management, refer to the [configuration documentation](/docs/saas-shield/cloaked-search/configuration).
+Only documents belonging to `tenant-1` will be encrypted. To better understand Cloaked Search's key management, refer to the
+[configuration documentation](https://ironcorelabs.com/docs/saas-shield/cloaked-search/configuration).
 
 ```bash
 ./populate_index.sh
@@ -53,7 +54,7 @@ _Note that we are making this request directly to Elasticsearch (port 9200) so w
 Let's get all the documents belonging to `tenant-1` and see what's in the index!
 
 ```bash
-curl -s -G --data-urlencode "q=+tenant_id:tenant-1" localhost:9200/try_cloaked_search/_search | jq
+curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\"" localhost:9200/try_cloaked_search/_search | jq
 ```
 
 We are protecting the `body` and `summary` fields from the original document. These fields are no longer attached to the document;
@@ -75,44 +76,45 @@ curl -s -G --data-urlencode "q=title:list" localhost:9200/try_cloaked_search/_se
 
 ### Sample Queries
 
-These are a couple examples of simple term queries:
+These are a couple examples of simple term queries. They are still querying on the `title` field, which is unprotected.
 
 ```bash
-curl -s -G --data-urlencode "q=+tenant_id:tenant-1 AND title:Japan" localhost:8675/try_cloaked_search/_search | jq
+curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND title:Japan" localhost:8675/try_cloaked_search/_search | jq
+curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND title:cup" localhost:8675/try_cloaked_search/_search | jq
 ```
 
-```bash
-curl -s -G --data-urlencode "q=+tenant_id:tenant-1 AND title:cup" localhost:8675/try_cloaked_search/_search | jq
-```
+Compare these results to the ones returned by querying Elasticsearch directly. The same documents are returned, but the contents are much different.
+You can see how Cloaked Search transparently handles the decryption of the document to allow you to see the data in the fields that were protected, `summary` and `body`.
 
-Compare these results to the ones returned by querying Elasticsearch directly:
 ```bash
-curl -s -G --data-urlencode "q=+tenant_id:tenant-1 AND title:Japan" localhost:9200/try_cloaked_search/_search | jq
-curl -s -G --data-urlencode "q=+tenant_id:tenant-1 AND title:cup" localhost:9200/try_cloaked_search/_search | jq
+curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND title:Japan" localhost:9200/try_cloaked_search/_search | jq
+curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND title:cup" localhost:9200/try_cloaked_search/_search | jq
 ```
 
 Now try querying on a protected field:
 
 ```bash
-curl -s -G --data-urlencode "q=+tenant_id:tenant-1 AND summary:glasgow" localhost:8675/try_cloaked_search/_search | jq
+curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND summary:glasgow" localhost:8675/try_cloaked_search/_search | jq
 ```
 
-Term queries can also be combined with ORs or ANDs like this:
+Term queries can also be combined with ORs or ANDs, and you can mix protected and unprotected fields. For example,
 
 ```bash
-curl -s -G --data-urlencode "q=+tenant_id:tenant-1 AND (summary:cup OR title:Japan)" localhost:8675/try_cloaked_search/_search | jq
+curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND (title:cup OR title:Japan)" localhost:8675/try_cloaked_search/_search | jq
+curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND (summary:cup OR title:Japan)" localhost:8675/try_cloaked_search/_search | jq
+curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND (summary:cup OR body:Japan)" localhost:8675/try_cloaked_search/_search | jq
 ```
 
 Phrases can also be searched using quoted queries like this:
 
 ```bash
-curl -s -G --data-urlencode "q=+tenant_id:tenant-1 AND summary:\"Cheerleading in Japan\"" localhost:8675/try_cloaked_search/_search | jq
+curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND summary:\"Cheerleading in Japan\"" localhost:8675/try_cloaked_search/_search | jq
 ```
 
 Finally, here is an example of a prefix query:
 
 ```bash
-curl -s -G --data-urlencode "q=+tenant_id:tenant-1 AND title:list*" localhost:8675/try_cloaked_search/_search | jq
+curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND summary:list*" localhost:8675/try_cloaked_search/_search | jq
 ```
 
 You can replace the query with anything you like. Make sure you leave the `tenant_id` portion.

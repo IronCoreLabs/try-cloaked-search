@@ -10,7 +10,16 @@ else
    exit 2
 fi
 # Create the index in elastic search
-curl -s -X PUT localhost:8675/try_cloaked_search/
+curl --request PUT \
+  --url http://localhost:8675/try_cloaked_search \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"mappings": {
+		"properties": {
+			"_encrypted_source": { "enabled": false }
+		}
+	}
+}'
 
 # Configure the parallelism of the index
 NUM_THREADS=5

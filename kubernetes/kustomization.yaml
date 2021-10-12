@@ -27,7 +27,7 @@ secretGenerator:
 images:
 - name: cloaked-search-placeholder
   newName: gcr.io/ironcore-images/cloaked-search
-  newTag: 0.1.48
+  newTag: 0.5.0
 - name: elasticsearch-placeholder
   newName: elasticsearch
   newTag: 7.14.0

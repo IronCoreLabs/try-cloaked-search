@@ -89,7 +89,7 @@ These are a couple examples of simple term queries. They are still querying on t
 ./query-cloaked-search.sh '+tenant_id:"tenant-1" AND title:cup' | jq
 ```
 
-Compare these results to the ones returned by querying Elasticsearch directly. The same documents are returned, but the contents are very different.
+Compare these results to the ones returned by querying the search service directly. The same documents are returned, but the contents are very different.
 You can see how Cloaked Search transparently handles the decryption of the document to allow you to see the data in the fields that were protected, `summary` and `body`.
 
 ```bash

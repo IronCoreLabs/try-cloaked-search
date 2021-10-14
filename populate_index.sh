@@ -9,7 +9,7 @@ else
    echo "Unknown platform"
    exit 2
 fi
-# Create the index in elastic search
+# Create the index in the search service
 curl -u admin:admin\
   --request PUT \
   --url http://localhost:8675/try_cloaked_search \

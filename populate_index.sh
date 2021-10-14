@@ -10,7 +10,8 @@ else
    exit 2
 fi
 # Create the index in elastic search
-curl --request PUT \
+curl -u admin:admin\
+  --request PUT \
   --url http://localhost:8675/try_cloaked_search \
   --header 'Content-Type: application/json' \
   --data '{

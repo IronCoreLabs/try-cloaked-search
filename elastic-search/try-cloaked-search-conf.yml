@@ -1,0 +1,24 @@
+search_service_url: "http://search-service:9200"
+standalone_keys:
+  - id: primary-key
+    keypath: /secrets/cloaked-search/key1
+    primary: true
+indices:
+  - name: try_cloaked_search
+    fields:
+      - name: body
+        analyzer:
+          tokenizer: default
+          filters:
+            - lowercase
+            - terms
+            - phrases
+            - substring
+      - name: summary
+        analyzer:
+          tokenizer: default
+          filters:
+            - lowercase
+            - terms
+            - phrases
+            - substring

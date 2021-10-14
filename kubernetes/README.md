@@ -1,7 +1,7 @@
 # Contents
 
-This is a test deployment of cloaked-search, along with a demo deployment of Elasticsearch. The configurations are for illustrative
-purposes, not production.
+This is an example deployment of cloaked-search, along with a demo deployment of Elasticsearch. The configurations can be used as
+a starting point for a customized, production deployment.
 
 - [cs-deploy.yaml](cs-deploy.yaml): The [Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) of the
   Cloaked Search Proxy.
@@ -42,8 +42,8 @@ indices, since there's only one ES instance.
 1. `kubectl port-forward -n cloaked-search svc/elasticsearch 9200`
 1. `curl -X PUT -H "Content-type: application/json" -d '{ "index": { "number_of_replicas": 0 }}' http://localhost:9200/_settings`
 
-If you don't do this, elasticsearch status will change to yellow, which Kubernetes will interpret as "not ready" and take it of the
-service load balancer.
+If you don't do this, elasticsearch status will change to yellow, which Kubernetes will interpret as "not ready" and take it out of
+the service load balancer.
 
 # Querying
 

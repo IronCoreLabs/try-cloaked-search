@@ -1,10 +1,10 @@
 # Try Cloaked Search (in ~5 Minutes)
 
-Cloaked Search is a proxy for Elasticsearch that protects the indexed data from prying eyes. Cloaked Search's API is the same as the underlying Elasticsearch API.
+Cloaked Search is a proxy for Elasticsearch/OpenSearch that protects the indexed data from prying eyes. Cloaked Search's API is the same as the underlying search service API.
 
 In about 5 minutes, you will have:
 
-- Elasticsearch running on your local machine
+- Elasticsearch/OpenSearch running on your local machine
 - Cloaked Search running on your local machine
 - sample data indexed with `summary` and `body` as protected fields
 - query results from sample queries using the protected `summary` and `body` fields

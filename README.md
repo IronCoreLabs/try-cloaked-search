@@ -1,10 +1,10 @@
 # Try Cloaked Search (in ~5 Minutes)
 
-Cloaked Search is a proxy for Elasticsearch that protects the indexed data from prying eyes. Cloaked Search's API is the same as the underlying Elasticsearch API.
+Cloaked Search is a proxy for Elasticsearch/OpenSearch that protects the indexed data from prying eyes. Cloaked Search's API is the same as the underlying search service API.
 
 In about 5 minutes, you will have:
 
-- Elasticsearch running on your local machine
+- Elasticsearch/OpenSearch running on your local machine
 - Cloaked Search running on your local machine
 - sample data indexed with `summary` and `body` as protected fields
 - query results from sample queries using the protected `summary` and `body` fields
@@ -25,12 +25,18 @@ git clone https://github.com/IronCoreLabs/try-cloaked-search.git
 
 All other commands are assumed be run from within directory where you cloned the repo.
 
-### Start Cloaked Search and Elasticsearch
+### Start Cloaked Search and a search service
 
-_Note: This example install uses ports 9200 (Elasticsearch) and 8675 (Cloaked Search). Be sure you don't have an existing Elasticsearch running on port 9200 before beginning._
+_Note: This example install uses ports 9200 (Elasticsearch/OpenSearch) and 8675 (Cloaked Search). Be sure you don't have an existing search service running on port 9200 before beginning._
 
 ```bash
-docker-compose up
+docker-compose -f elastic-search/docker-compose.yml up # for elastic search
+```
+
+or
+
+```bash
+docker-compose -f open-search/docker-compose.yml up # for open search
 ```
 
 **Note: Future commands will be targeting Cloaked Search on port 8675**
@@ -49,12 +55,12 @@ Only documents belonging to `tenant-1` will be encrypted. To better understand C
 
 ### (optional) Look at an encrypted index
 
-_Note that we are making this request directly to Elasticsearch (port 9200) so we can see what's actually stored._
+_Note that all queries made with `./query-search-service.sh` are being made directly to your search service. We are using a script to detect if you're running OpenSearch or Elasticsearch, but there is no involvement from Cloaked Search. Since these requests go directly to the search service (port 9200), we can see what's actually stored._
 
 Let's get all the documents belonging to `tenant-1` and see what's in the index!
 
 ```bash
-curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\"" localhost:9200/try_cloaked_search/_search | jq
+./query-search-service.sh '+tenant_id:"tenant-1"' | jq
 ```
 
 We are protecting the `body` and `summary` fields from the original document. These fields are no longer attached to the document;
@@ -69,7 +75,7 @@ to return the original versions of any protected fields.
 The data not associated with any tenant is readable in the clear. If we do a very generic query, some documents with no tenant will come back.
 
 ```bash
-curl -s -G --data-urlencode "q=title:list" localhost:9200/try_cloaked_search/_search | jq
+./query-search-service.sh 'title:list' | jq
 ```
 
 ## Querying Protected Fields
@@ -79,46 +85,46 @@ curl -s -G --data-urlencode "q=title:list" localhost:9200/try_cloaked_search/_se
 These are a couple examples of simple term queries. They are still querying on the `title` field, which is unprotected.
 
 ```bash
-curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND title:Japan" localhost:8675/try_cloaked_search/_search | jq
-curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND title:cup" localhost:8675/try_cloaked_search/_search | jq
+./query-cloaked-search.sh '+tenant_id:"tenant-1" AND title:Japan' | jq
+./query-cloaked-search.sh '+tenant_id:"tenant-1" AND title:cup' | jq
 ```
 
-Compare these results to the ones returned by querying Elasticsearch directly. The same documents are returned, but the contents are much different.
+Compare these results to the ones returned by querying the search service directly. The same documents are returned, but the contents are very different.
 You can see how Cloaked Search transparently handles the decryption of the document to allow you to see the data in the fields that were protected, `summary` and `body`.
 
 ```bash
-curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND title:Japan" localhost:9200/try_cloaked_search/_search | jq
-curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND title:cup" localhost:9200/try_cloaked_search/_search | jq
+./query-search-service.sh '+tenant_id:"tenant-1" AND title:Japan' | jq
+./query-search-service.sh '+tenant_id:"tenant-1" AND title:cup' | jq
 ```
 
 Now try querying on a protected field:
 
 ```bash
-curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND summary:glasgow" localhost:8675/try_cloaked_search/_search | jq
+./query-cloaked-search.sh '+tenant_id:"tenant-1" AND summary:glasgow' | jq
 ```
 
 Term queries can also be combined with ORs or ANDs, and you can mix protected and unprotected fields. For example,
 
 ```bash
-curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND (title:cup OR title:Japan)" localhost:8675/try_cloaked_search/_search | jq
-curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND (summary:cup OR title:Japan)" localhost:8675/try_cloaked_search/_search | jq
-curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND (summary:cup OR body:Japan)" localhost:8675/try_cloaked_search/_search | jq
+./query-cloaked-search.sh '+tenant_id:"tenant-1" AND (title:cup OR title:Japan)' | jq
+./query-cloaked-search.sh '+tenant_id:"tenant-1" AND (summary:cup OR title:Japan)' | jq
+./query-cloaked-search.sh '+tenant_id:"tenant-1" AND (summary:cup OR body:Japan)' | jq
 ```
 
 Phrases can also be searched using quoted queries like this:
 
 ```bash
-curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND summary:\"Cheerleading in Japan\"" localhost:8675/try_cloaked_search/_search | jq
+./query-cloaked-search.sh '+tenant_id:"tenant-1" AND summary:"Cheerleading in Japan"' | jq
 ```
 
 Finally, here is an example of a prefix query:
 
 ```bash
-curl -s -G --data-urlencode "q=+tenant_id:\"tenant-1\" AND summary:list*" localhost:8675/try_cloaked_search/_search | jq
+./query-cloaked-search.sh '+tenant_id:"tenant-1" AND summary:pro*' | jq
 ```
 
 You can replace the query with anything you like. Make sure you leave the `tenant_id` portion.
-We currently support a subset of Elasticsearch's query language, but are continuing to add support.
+We currently support a subset of the search service's query language, but are continuing to add support.
 
 ## Next Steps
 
@@ -128,4 +134,4 @@ Use the [Kubernetes template](kubernetes) in this repository to make a simple Ku
 
 See the [configuration docs](https://ironcorelabs.com/docs/saas-shield/cloaked-search/configuration/) for info on how to configure and deploy Cloaked Search.
 
-If you are interested in the underlying technology or in the security of the underlying Elasticsearch index, see the [What Is Encrypted Search](https://ironcorelabs.com/docs/saas-shield/cloaked-search/what-is-encrypted-search/) page.
+If you are interested in the underlying technology or in the security of the underlying search service index, see the [What Is Encrypted Search](https://ironcorelabs.com/docs/saas-shield/cloaked-search/what-is-encrypted-search/) page.

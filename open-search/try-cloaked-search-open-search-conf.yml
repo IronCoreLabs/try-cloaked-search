@@ -1,4 +1,5 @@
-search_service_url: "http://elasticsearch:9200"
+search_service_url: "https://search-service:9200"
+accept_invalid_certs: true
 standalone_keys:
   - id: primary-key
     keypath: /secrets/cloaked-search/key1

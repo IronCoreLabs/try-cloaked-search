@@ -1,5 +1,33 @@
 # Try Cloaked Search (in ~5 Minutes)
 
+Cloaked Search is a proxy for Elasticsearch that protects the indexed data from prying eyes. Cloaked Search's API is the same as the underlying Elasticsearch API.
+
+In about 5 minutes, you will have:
+
+- Elasticsearch running on your local machine
+- Cloaked Search running on your local machine
+- sample data indexed with `summary` and `body` as protected fields
+- query results from sample queries using the protected `summary` and `body` fields
+
+All stored data is on a temporary volume inside of docker. No changes will be made to your machine outside the directory where you cloned the `try-cloaked-search` repo.
+
+## Dependencies
+
+To try Cloaked Search you just need a basic \*nix installation and `docker` + `docker-compose`. Some of the commands below also use `jq` for JSON formatting. If you don't have `jq`, you can safely remove those portions of the command.
+
+## Get Cloaked Search Running
+
+Clone the [try-cloaked-search](https://github.com/IronCoreLabs/try-cloaked-search) git repo.
+
+```bash
+git clone https://github.com/IronCoreLabs/try-cloaked-search.git
+```
+
+All other commands are assumed be run from within directory where you cloned the repo.
+or
+
+### Start Cloaked Search and a search service
+
 _Note: This example install uses ports 9200 (Elasticsearch/OpenSearch) and 8675 (Cloaked Search). Be sure you don't have an existing search service running on port 9200 before beginning._
 
 ```bash

@@ -55,12 +55,12 @@ Only documents belonging to `tenant-1` will be encrypted. To better understand C
 
 ### (optional) Look at an encrypted index
 
-_Note that all queries made with `./query-search-service.sh` are being made directly to your search service. We are using a script to detect if you're running open search or elastic search, but there is no involvement from cloaked search. Since these requests go directly to the search service (port 9200) so we can see what's actually stored._
+_Note that all queries made with `./query-search-service.sh` are being made directly to your search service. We are using a script to detect if you're running OpenSearch or Elasticsearch, but there is no involvement from Cloaked Search. Since these requests go directly to the search service (port 9200), we can see what's actually stored._
 
 Let's get all the documents belonging to `tenant-1` and see what's in the index!
 
 ```bash
-./query-search-service.sh "+tenant_id:"tenant-1""
+./query-search-service.sh '+tenant_id:"tenant-1"'
 ```
 
 We are protecting the `body` and `summary` fields from the original document. These fields are no longer attached to the document;
@@ -75,7 +75,7 @@ to return the original versions of any protected fields.
 The data not associated with any tenant is readable in the clear. If we do a very generic query, some documents with no tenant will come back.
 
 ```bash
-./query-search-service.sh "title:list"
+./query-search-service.sh 'title:list'
 ```
 
 ## Querying Protected Fields
@@ -89,7 +89,7 @@ These are a couple examples of simple term queries. They are still querying on t
 ./query-cloaked-search.sh '+tenant_id:"tenant-1" AND title:cup'
 ```
 
-Compare these results to the ones returned by querying Elasticsearch directly. The same documents are returned, but the contents are much different.
+Compare these results to the ones returned by querying Elasticsearch directly. The same documents are returned, but the contents are very different.
 You can see how Cloaked Search transparently handles the decryption of the document to allow you to see the data in the fields that were protected, `summary` and `body`.
 
 ```bash

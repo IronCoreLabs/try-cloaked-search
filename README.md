@@ -60,7 +60,7 @@ _Note that all queries made with `./query-search-service.sh` are being made dire
 Let's get all the documents belonging to `tenant-1` and see what's in the index!
 
 ```bash
-./query-search-service.sh '+tenant_id:"tenant-1"'
+./query-search-service.sh '+tenant_id:"tenant-1"' | jq
 ```
 
 We are protecting the `body` and `summary` fields from the original document. These fields are no longer attached to the document;
@@ -75,7 +75,7 @@ to return the original versions of any protected fields.
 The data not associated with any tenant is readable in the clear. If we do a very generic query, some documents with no tenant will come back.
 
 ```bash
-./query-search-service.sh 'title:list'
+./query-search-service.sh 'title:list' | jq
 ```
 
 ## Querying Protected Fields
@@ -85,42 +85,42 @@ The data not associated with any tenant is readable in the clear. If we do a ver
 These are a couple examples of simple term queries. They are still querying on the `title` field, which is unprotected.
 
 ```bash
-./query-cloaked-search.sh '+tenant_id:"tenant-1" AND title:Japan'
-./query-cloaked-search.sh '+tenant_id:"tenant-1" AND title:cup'
+./query-cloaked-search.sh '+tenant_id:"tenant-1" AND title:Japan' | jq
+./query-cloaked-search.sh '+tenant_id:"tenant-1" AND title:cup' | jq
 ```
 
 Compare these results to the ones returned by querying Elasticsearch directly. The same documents are returned, but the contents are very different.
 You can see how Cloaked Search transparently handles the decryption of the document to allow you to see the data in the fields that were protected, `summary` and `body`.
 
 ```bash
-./query-search-service.sh '+tenant_id:"tenant-1" AND title:Japan'
-./query-search-service.sh '+tenant_id:"tenant-1" AND title:cup'
+./query-search-service.sh '+tenant_id:"tenant-1" AND title:Japan' | jq
+./query-search-service.sh '+tenant_id:"tenant-1" AND title:cup' | jq
 ```
 
 Now try querying on a protected field:
 
 ```bash
-./query-cloaked-search.sh '+tenant_id:"tenant-1" AND summary:glasgow'
+./query-cloaked-search.sh '+tenant_id:"tenant-1" AND summary:glasgow' | jq
 ```
 
 Term queries can also be combined with ORs or ANDs, and you can mix protected and unprotected fields. For example,
 
 ```bash
-./query-cloaked-search.sh '+tenant_id:"tenant-1" AND (title:cup OR title:Japan)'
-./query-cloaked-search.sh '+tenant_id:"tenant-1" AND (summary:cup OR title:Japan)'
-./query-cloaked-search.sh '+tenant_id:"tenant-1" AND (summary:cup OR body:Japan)'
+./query-cloaked-search.sh '+tenant_id:"tenant-1" AND (title:cup OR title:Japan)' | jq
+./query-cloaked-search.sh '+tenant_id:"tenant-1" AND (summary:cup OR title:Japan)' | jq
+./query-cloaked-search.sh '+tenant_id:"tenant-1" AND (summary:cup OR body:Japan)' | jq
 ```
 
 Phrases can also be searched using quoted queries like this:
 
 ```bash
-./query-cloaked-search.sh '+tenant_id:"tenant-1" AND summary:"Cheerleading in Japan"'
+./query-cloaked-search.sh '+tenant_id:"tenant-1" AND summary:"Cheerleading in Japan"' | jq
 ```
 
 Finally, here is an example of a prefix query:
 
 ```bash
-./query-cloaked-search.sh '+tenant_id:"tenant-1" AND summary:pro*'
+./query-cloaked-search.sh '+tenant_id:"tenant-1" AND summary:pro*' | jq
 ```
 
 You can replace the query with anything you like. Make sure you leave the `tenant_id` portion.

@@ -20,7 +20,7 @@ if [ $# -ne 1 ] ; then
 fi
 
 if [[ $needs_creds == "0" ]] ; then
-  curl -s -u admin:admin -G --data-urlencode "q=$1" "http://localhost:8675/try_cloaked_search/_search" | jq 
+  curl -s -u admin:admin -G --data-urlencode "q=$1" "http://localhost:8675/try_cloaked_search/_search"
 else
-  curl -s -G --data-urlencode "q=$1" "http://localhost:8675/try_cloaked_search/_search" | jq
+  curl -s -G --data-urlencode "q=$1" "http://localhost:8675/try_cloaked_search/_search"
 fi

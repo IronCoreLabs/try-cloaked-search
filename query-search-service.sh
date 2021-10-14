@@ -20,7 +20,7 @@ if [ $# -ne 1 ] ; then
 fi
 
 if [[ $should_https == "0" ]] ; then
-  curl -s --insecure -u admin:admin -G --data-urlencode "q=$1" "https://localhost:9200/try_cloaked_search/_search" | jq 
+  curl -s --insecure -u admin:admin -G --data-urlencode "q=$1" "https://localhost:9200/try_cloaked_search/_search"
 else
-  curl -s -G --data-urlencode "q=$1" "localhost:9200/try_cloaked_search/_search" | jq
+  curl -s -G --data-urlencode "q=$1" "localhost:9200/try_cloaked_search/_search"
 fi

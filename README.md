@@ -97,7 +97,7 @@ Finally, here is an example of a prefix query:
 ```
 
 You can replace the query with anything you like. Make sure you leave the `tenant_id` portion.
-We currently support a subset of Elasticsearch's query language, but are continuing to add support.
+We currently support a subset of the search service's query language, but are continuing to add support.
 
 ## Next Steps
 
@@ -107,4 +107,4 @@ Use the [Kubernetes template](kubernetes) in this repository to make a simple Ku
 
 See the [configuration docs](https://ironcorelabs.com/docs/saas-shield/cloaked-search/configuration/) for info on how to configure and deploy Cloaked Search.
 
-If you are interested in the underlying technology or in the security of the underlying Elasticsearch index, see the [What Is Encrypted Search](https://ironcorelabs.com/docs/saas-shield/cloaked-search/what-is-encrypted-search/) page.
+If you are interested in the underlying technology or in the security of the underlying search service index, see the [What Is Encrypted Search](https://ironcorelabs.com/docs/saas-shield/cloaked-search/what-is-encrypted-search/) page.

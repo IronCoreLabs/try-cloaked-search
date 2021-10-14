@@ -6,6 +6,7 @@ is_opensearch() {
 }
 needs_creds=$(is_opensearch)
 function usage () {
+  echo "Makes queries to a local version of the cloaked search proxy."
   echo "Usage:"
   echo " $0 [query]"
   echo ""

@@ -24,9 +24,13 @@ spec:
         ports:
           - containerPort: 8675
             name: http
+        livenessProbe:
+          httpGet:
+            path: /_cloaked_search/live
+            port: http
         readinessProbe:
           httpGet:
-            path: /_cluster/health?wait_for_status=yellow
+            path: /_cloaked_search/health
             port: http
         securityContext:
           readOnlyRootFilesystem: true

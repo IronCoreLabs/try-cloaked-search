@@ -24,7 +24,6 @@ git clone https://github.com/IronCoreLabs/try-cloaked-search.git
 ```
 
 All other commands are assumed be run from within directory where you cloned the repo.
-or
 
 ### Start Cloaked Search and a search service
 

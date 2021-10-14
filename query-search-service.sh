@@ -6,11 +6,12 @@ is_opensearch() {
 }
 should_https=$(is_opensearch)
 function usage () {
+  echo "Makes queries to a local version of the search service."
   echo "Usage:"
   echo " $0 [query]"
   echo ""
   echo "Ex:"
-  echo "  $0 \"tenant_id:tenant-1 AND title:fred\""
+  echo "  $0 \"+tenant_id:tenant-1 AND title:fred\""
   exit 1
 }
 

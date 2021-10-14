@@ -1,5 +1,5 @@
 #!/bin/bash
-#Checks to see if we're running opensearch, which requires https and a user
+#Checks to see if we're running opensearch locally, which means we need the user
 is_opensearch() {
     (curl -s --insecure -u admin:admin https://localhost:9200/_cluster/health 2>&1 > /dev/null)
     echo $?
@@ -10,7 +10,7 @@ function usage () {
   echo " $0 [query]"
   echo ""
   echo "Ex:"
-  echo "  $0 \"tenant_id:tenant-1 AND title:fred\""
+  echo "  $0 \"+tenant_id:tenant-1 AND title:fred\""
   exit 1
 }
 

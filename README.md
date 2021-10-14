@@ -120,7 +120,7 @@ Phrases can also be searched using quoted queries like this:
 Finally, here is an example of a prefix query:
 
 ```bash
-./query-cloaked-search.sh '+tenant_id:"tenant-1" AND summary:list*'
+./query-cloaked-search.sh '+tenant_id:"tenant-1" AND summary:pro*'
 ```
 
 You can replace the query with anything you like. Make sure you leave the `tenant_id` portion.

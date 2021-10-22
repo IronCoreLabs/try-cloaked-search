@@ -116,7 +116,7 @@ Finally, here is an example of a prefix query:
 ./query-cloaked-search.sh '+tenant_id:"tenant-1" AND summary:pro*' | jq
 ```
 
-You can replace the query with anything you like. Make sure you leave the `tenant_id` portion.
+You can replace the query with anything you like. Make sure you have the `+tenant_id` in the query. `populate_index.sh` loaded 1000 documents, 1/2 are tagged with `tenant-1` and the others are tagged with `tenant-2`.
 We currently support a subset of the search service's query language, but are continuing to add support.
 
 ## Next Steps

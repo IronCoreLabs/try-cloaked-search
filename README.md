@@ -63,12 +63,12 @@ Let's get all the documents belonging to `tenant-1` and see what's in the index!
 ```
 
 We are protecting the `body` and `summary` fields from the original document. These fields are no longer attached to the document;
-instead, the blind index tokens for `body` and `summary` are stored in the `protected_body` and `protected_summary` fields, respectively.
-You will also notice an `_encrypted_source` field; this contains an encrypted version of the entire document, which allows Cloaked Search
-to return the original versions of any protected fields.
+instead, the blind index tokens for `body` and `summary` are stored in the `_icl_p_body` and `_icl_p_summary` fields, respectively.
+You will also notice an `_icl_encrypted_source` field; this contains an encrypted version of the fields that have been protected, which allows Cloaked Search
+to return them to their original versions.
 
 ```
-"protected_summary": "7B76C95A 616544A2 B41FA81E 85933317 E30236D5 ...",
+"_icl_p_summary": "7B76C95A 616544A2 B41FA81E 85933317 E30236D5 ...",
 ```
 
 ## Querying Protected Fields

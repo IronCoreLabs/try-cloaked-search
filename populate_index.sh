@@ -17,7 +17,7 @@ curl -u admin:admin\
   --data '{
 	"mappings": {
 		"properties": {
-			"_encrypted_source": { "enabled": false }
+			"_icl_encrypted_source": { "enabled": false }
 		}
 	}
 }'

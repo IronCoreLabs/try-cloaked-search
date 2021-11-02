@@ -16,8 +16,20 @@ curl -u admin:admin\
   --header 'Content-Type: application/json' \
   --data '{
 	"mappings": {
+    "dynamic_templates": [
+          {
+            "protected_fields": {
+              "match_mapping_type": "string",
+              "match": "_icl_p_*",
+              "mapping": {
+                "type": "text"
+              }
+            }
+          }
+        ],
 		"properties": {
-			"_icl_encrypted_source": { "enabled": false }
+			"_icl_encrypted_source": { "enabled": false },
+      "_icl_search_key_id" : { "type": "keyword" }
 		}
 	}
 }'

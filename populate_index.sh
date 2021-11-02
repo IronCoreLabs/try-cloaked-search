@@ -15,7 +15,7 @@ curl -u admin:admin\
   --url http://localhost:8675/try_cloaked_search \
   --header 'Content-Type: application/json' \
   --data '{
-	"mappings": {
+  "mappings": {
     "dynamic_templates": [
           {
             "protected_fields": {
@@ -27,11 +27,11 @@ curl -u admin:admin\
             }
           }
         ],
-		"properties": {
-			"_icl_encrypted_source": { "enabled": false },
+    "properties": {
+      "_icl_encrypted_source": { "enabled": false },
       "_icl_search_key_id" : { "type": "keyword" }
-		}
-	}
+    }
+  }
 }'
 
 # Configure the parallelism of the index

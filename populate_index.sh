@@ -17,21 +17,22 @@ curl -u admin:admin\
   --data '{
   "mappings": {
     "dynamic_templates": [
-          {
-            "protected_fields": {
-              "match_mapping_type": "string",
-              "match": "_icl_p_*",
-              "mapping": {
-                "type": "text"
-              }
-            }
+      {
+        "protected_fields": {
+          "match_mapping_type": "string",
+          "match": "_icl_p_*",
+          "mapping": {
+            "type": "text"
           }
-        ],
+        }
+      }
+    ],
     "properties": {
       "_icl_encrypted_source": { "enabled": false },
-      "_icl_search_key_id" : { "type": "keyword" }
+      "_icl_search_key_id": { "type": "keyword" }
     }
   }
+
 }'
 
 # Configure the parallelism of the index

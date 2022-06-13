@@ -1,0 +1,426 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: IronCore Labs Cloaked Search with Elasticsearch demo
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: Cloaked Search Internet endpoint
+      Parameters:
+      - CSDNSName
+
+Parameters:
+  CSDNSName:
+    Type: String
+    Description: Fully Qualified Domain Name to be used as the Cloaked Search endpoint.
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/24
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}/vpc
+
+  SubnetPub1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select
+      - 0
+      - Fn::GetAZs: !Ref "AWS::Region"
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.0.128/26
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}/pub1
+
+  SubnetPub2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select
+      - 1
+      - Fn::GetAZs: !Ref "AWS::Region"
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.0.192/26
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}/pub2
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}
+
+  IGWAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}/pub
+
+  PublicDefaultRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref PublicRouteTable
+
+  SubnetPub1Routes:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref SubnetPub1
+
+  SubnetPub2Routes:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref SubnetPub2
+
+  LBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow traffic from the Internet to the load balancer.
+      GroupName: !Sub ${AWS::StackName}/alb
+      SecurityGroupIngress:
+      - Description: Allow Internet HTTP
+        CidrIp: 0.0.0.0/0
+        IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+      - Description: Allow Internet HTTPS
+        CidrIp: 0.0.0.0/0
+        IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+      VpcId: !Ref VPC
+
+  ESSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow traffic from CS to ES.
+      GroupName: !Sub ${AWS::StackName}/es
+      SecurityGroupIngress:
+      - Description: Allow ES traffic
+        SourceSecurityGroupId: !Ref CSSecurityGroup
+        IpProtocol: tcp
+        FromPort: 9200
+        ToPort: 9200
+      VpcId: !Ref VPC
+
+  CSToESSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Allow health check
+      GroupId: !Ref ESSecurityGroup
+      SourceSecurityGroupId: !Ref ESSecurityGroup
+      FromPort: 9200
+      ToPort: 9200
+      IpProtocol: tcp
+
+  CSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow traffic from the ALB to the CS container.
+      GroupName: !Sub ${AWS::StackName}/cloaked-search
+      SecurityGroupIngress:
+      - Description: Allow 8675
+        SourceSecurityGroupId: !Ref LBSecurityGroup
+        IpProtocol: tcp
+        FromPort: 8675
+        ToPort: 8675
+      VpcId: !Ref VPC
+
+  CSDNSZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      HostedZoneConfig:
+        Comment: !Sub "Hosted zone for Cloaked Search for domain ${CSDNSName}"
+      Name: !Ref CSDNSName
+
+  CSDNSCAARecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref CSDNSZone
+      Name: !Ref CSDNSName
+      ResourceRecords:
+      - "0 issue \"amazon.com\""
+      TTL: 300
+      Type: CAA
+
+  CSKey1:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: The primary encryption key used by Cloaked Search.
+      Name: !Sub /${AWS::StackName}/key1
+      SecretString: 60e0787286bf350ec4db6a89c54efea38d09238ac80fc9a1401c0291f96bd1ee
+      Tags:
+      - Key: stack-name
+        Value: !Ref AWS::StackName
+
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Ref AWS::StackName
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Ref AWS::StackName
+      RetentionInDays: 30
+
+  EcsTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: ECS task execution role for Cloaked Search components.
+      AssumeRolePolicyDocument:
+        "Version": "2012-10-17"
+        "Statement":
+        - "Sid": ""
+          "Effect": "Allow"
+          "Principal":
+            "Service": "ecs-tasks.amazonaws.com"
+          "Action": "sts:AssumeRole"
+      Policies:
+      - PolicyName: EcsTaskExecutionPolicy
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Resource: !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:${LogGroup}:log-stream:*"
+          - Effect: Allow
+            Action: secretsmanager:GetSecretValue
+            Resource:
+            - !Ref CSKey1
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}
+
+  ESTask:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+        - Environment:
+          - Name: discovery.type
+            Value: single-node
+          # This is disabled because ES doesn't signal healthy until it has some data in it.
+          # HealthCheck:
+          #   Command:
+          #   - CMD-SHELL
+          #   - wget -O /dev/null http://127.0.0.1:9200/_cluster/health?wait_for_status=yellow
+          Image: elasticsearch:7.17.4
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref AWS::Region
+              awslogs-group: !Ref LogGroup
+              awslogs-stream-prefix: es
+          Name: elasticsearch
+          PortMappings:
+            - ContainerPort: 9200
+              Protocol: TCP
+      Cpu: "2048"
+      ExecutionRoleArn: !Ref EcsTaskExecutionRole
+      Memory: "4096"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}/es
+
+  CSTask:
+    Type: AWS::ECS::TaskDefinition
+    DependsOn:
+    - CSCertificate
+    Properties:
+      ContainerDefinitions:
+        - Environment:
+          - Name: RUST_LOG
+            Value: info
+          - Name: CS_CONFIG
+            Value: |
+              search_service_url: "http://elasticsearch.local:9200"
+              standalone_keys:
+                - id: primary-key
+                  keypath: /secrets/cloaked-search/key1
+                  primary: true
+              indices:
+                - name: try_cloaked_search
+                  fields:
+                    - name: title
+                      analyzer:
+                        tokenizer: default
+                        filters:
+                          - lowercase
+                          - terms
+                          - phrases
+                          - substring
+          Secrets:
+          - Name: CS_KEY1
+            ValueFrom: !Ref CSKey1
+          HealthCheck:
+            Command:
+            - CMD-SHELL
+            - wget -O /dev/null http://127.0.0.1:8675/_cloaked_search/live
+          Image: gcr.io/ironcore-images/cloaked-search:1.1.1
+          EntryPoint:
+          - sh
+          - -c
+          - |
+            echo "${CS_CONFIG}" > /app/deploy.yml &&
+            mkdir -p /secrets/cloaked-search &&
+            echo "${CS_KEY1}" > /secrets/cloaked-search/key1 &&
+            exec /app/cloaked-search-proxy /app/deploy.yml
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref AWS::Region
+              awslogs-group: !Ref LogGroup
+              awslogs-stream-prefix: cs
+          Name: cloaked-search
+          PortMappings:
+            - ContainerPort: 8675
+              Protocol: TCP
+      Cpu: "2048"
+      ExecutionRoleArn: !Ref EcsTaskExecutionRole
+      Memory: "4096"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}/cs
+
+  ESService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref ECSCluster
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+          - !Ref ESSecurityGroup
+          Subnets:
+            - !Ref SubnetPub1
+            - !Ref SubnetPub2
+      ServiceName: elasticsearch
+      ServiceRegistries:
+        - ContainerName: elasticsearch
+          RegistryArn: !GetAtt DnsService.Arn
+      TaskDefinition: !Ref ESTask
+
+  CSService:
+    Type: AWS::ECS::Service
+    DependsOn:
+    - LBListener
+    Properties:
+      Cluster: !Ref ECSCluster
+      DesiredCount: 1
+      LaunchType: FARGATE
+      LoadBalancers:
+        - ContainerName: cloaked-search
+          ContainerPort: 8675
+          TargetGroupArn: !Ref LBTargetGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+          - !Ref CSSecurityGroup
+          Subnets:
+            - !Ref SubnetPub1
+            - !Ref SubnetPub2
+      ServiceName: cloaked-search
+      TaskDefinition: !Ref CSTask
+
+  DnsNamespace:
+    Type: AWS::ServiceDiscovery::PrivateDnsNamespace
+    Properties:
+      Vpc: !Ref VPC
+      Name: local
+
+  DnsService:
+    Type: AWS::ServiceDiscovery::Service
+    Properties:
+      DnsConfig:
+        DnsRecords:
+          - Type: A
+            TTL: 60
+      Name: elasticsearch
+      NamespaceId: !GetAtt DnsNamespace.Id
+
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      IpAddressType: ipv4
+      Name: !Sub ${AWS::StackName}-cs
+      Scheme: internet-facing
+      SecurityGroups:
+      - !Ref LBSecurityGroup
+      Subnets:
+      - !Ref SubnetPub1
+      - !Ref SubnetPub2
+      Type: application
+
+  CSDNSBaseEntry:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref CSDNSZone
+      Name: !Ref CSDNSName
+      AliasTarget:
+        DNSName: !GetAtt LoadBalancer.DNSName
+        HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
+      Type: A
+
+  CSCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Sub "*.${CSDNSName}"
+      ValidationMethod: DNS
+      DomainValidationOptions:
+      - DomainName: !Ref CSDNSName
+        HostedZoneId: !Ref CSDNSZone
+      SubjectAlternativeNames:
+      - !Ref CSDNSName
+
+  LBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      Certificates:
+        - CertificateArn: !Ref CSCertificate
+      DefaultActions:
+        - Type: forward
+          ForwardConfig:
+            TargetGroups:
+            - TargetGroupArn: !Ref LBTargetGroup
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 443
+      Protocol: HTTPS
+      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01
+
+  LBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub ${AWS::StackName}-cs
+      Port: 8675
+      Protocol: HTTP
+      TargetType: ip
+      VpcId: !Ref VPC
+      HealthCheckPath: /_cloaked_search/health

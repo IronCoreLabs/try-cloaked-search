@@ -230,7 +230,7 @@ Resources:
               awslogs-region: !Ref AWS::Region
               awslogs-group: !Ref LogGroup
               awslogs-stream-prefix: es
-          Name: es
+          Name: elasticsearch
           PortMappings:
             - ContainerPort: 9200
               Protocol: TCP
@@ -293,7 +293,7 @@ Resources:
               awslogs-region: !Ref AWS::Region
               awslogs-group: !Ref LogGroup
               awslogs-stream-prefix: cs
-          Name: cs
+          Name: cloaked-search
           PortMappings:
             - ContainerPort: 8675
               Protocol: TCP
@@ -323,7 +323,7 @@ Resources:
             - !Ref SubnetPub2
       ServiceName: elasticsearch
       ServiceRegistries:
-        - ContainerName: es
+        - ContainerName: elasticsearch
           RegistryArn: !GetAtt DnsService.Arn
       TaskDefinition: !Ref ESTask
 
@@ -336,7 +336,7 @@ Resources:
       DesiredCount: 1
       LaunchType: FARGATE
       LoadBalancers:
-        - ContainerName: cs
+        - ContainerName: cloaked-search
           ContainerPort: 8675
           TargetGroupArn: !Ref LBTargetGroup
       NetworkConfiguration:
@@ -347,7 +347,7 @@ Resources:
           Subnets:
             - !Ref SubnetPub1
             - !Ref SubnetPub2
-      ServiceName: cs
+      ServiceName: cloaked-search
       TaskDefinition: !Ref CSTask
 
   DnsNamespace:

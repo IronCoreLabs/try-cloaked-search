@@ -1,20 +1,24 @@
 version: "3.3"
 services:
   search-service:
-    image: opensearchproject/opensearch:1.1.0
+    image: opensearchproject/opensearch:1.3.6
     ports:
       - 9200:9200
     environment:
       ES_JAVA_OPTS: "-Xmx1G"
       discovery.type: "single-node"
+      plugins.security.disabled: "true"
   cloaked-search:
-    image: "gcr.io/ironcore-images/cloaked-search:2.0.0.beta.2-amd64"
+    image: "gcr.io/ironcore-images/cloaked-search:2.0.0-RC1"
     ports:
       - 8675:8675
     volumes:
       - type: bind
-        source: ./try-cloaked-search-open-search-conf.yml
+        source: ../try-cloaked-search-conf.json
         target: /app/deploy.yml
+      - type: bind
+        source: ../indices
+        target: /app/indices
       - type: bind
         source: ../test-key
         target: /secrets/cloaked-search/key1

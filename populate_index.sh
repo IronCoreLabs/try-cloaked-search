@@ -20,7 +20,7 @@ curl -u admin:admin\
       {
         "protected_fields": {
           "match_mapping_type": "string",
-          "match": "_icl_p_*",
+          "path_match": "*_icl_p_*",
           "mapping": {
             "type": "text"
           }

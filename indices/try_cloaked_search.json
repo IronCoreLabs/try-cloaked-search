@@ -11,7 +11,7 @@
         "analyzer": {
           "type": "custom",
           "tokenizer": "standard",
-          "filter": ["lowercase", "ngram"]
+          "filter": ["lowercase"]
         }
       },
       "summary": {
@@ -20,7 +20,7 @@
         "analyzer": {
           "type": "custom",
           "tokenizer": "standard",
-          "filter": ["lowercase", "ngram"]
+          "filter": ["lowercase"]
         }
       }
     }

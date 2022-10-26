@@ -30,13 +30,13 @@ All other commands are assumed be run from within directory where you cloned the
 _Note: This example install uses ports 9200 (Elasticsearch/OpenSearch) and 8675 (Cloaked Search). Be sure you don't have an existing search service running on port 9200 before beginning._
 
 ```bash
-docker-compose -f elastic-search/docker-compose.yml up # for elastic search
+docker-compose -f elasticsearch/docker-compose.yml up # for Elasticsearch
 ```
 
 or
 
 ```bash
-docker-compose -f open-search/docker-compose.yml up # for open search
+docker-compose -f open-search/docker-compose.yml up # for Open Search
 ```
 
 **Note: Future commands will be targeting Cloaked Search on port 8675**
@@ -52,14 +52,14 @@ To better understand Cloaked Search's key management, refer to the [configuratio
 ./populate_index.sh
 ```
 
-### (optional) Look at an encrypted index
+### (ptional) Look at an encrypted index
 
 _Note that all queries made with `./query-search-service.sh` are being made directly to your search service. We are using a script to detect if you're running OpenSearch or Elasticsearch, but there is no involvement from Cloaked Search. Since these requests go directly to the search service (port 9200), we can see what's actually stored._
 
 Let's get all the documents belonging to `tenant-1` and see what's in the index!
 
 ```bash
-./query-search-service.sh '+tenant_id:"tenant-1"' | jq
+./query-search-service.sh '+tenant_id.keyword:"tenant-1"' | jq
 ```
 
 We are protecting the `body` and `summary` fields from the original document. These fields are no longer attached to the document;
@@ -118,6 +118,16 @@ Finally, here is an example of a prefix query on the `summary` field (the field 
 ```
 
 You can replace the query with anything you like. Make sure you have the `+tenant_id.keyword` in the query. `populate_index.sh` loaded 1000 documents, half are tagged with `tenant-1` and the others are tagged with `tenant-2`.
+
+### JSON queries
+
+Cloaked Search also supports requests other than Query String queries. For example,
+
+```bash
+./query-cloaked-search-json.sh 'japan' 'tenant-1' | jq
+```
+
+This searches for `Japan` in the protected `summary` field over all the documents belonging to `tenant-1`.
 
 ## Next Steps
 

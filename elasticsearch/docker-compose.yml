@@ -20,5 +20,5 @@ services:
         source: ../indices
         target: /app/indices
       - type: bind
-        source: ../test-key
+        source: ../example.key
         target: /secrets/cloaked-search/key1

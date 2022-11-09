@@ -52,7 +52,7 @@ To better understand Cloaked Search's key management, refer to the [configuratio
 ./populate_index.sh
 ```
 
-### (ptional) Look at an encrypted index
+### (Optional) Look at an encrypted index
 
 _Note that all queries made with `./query-search-service.sh` are being made directly to your search service. We are using a script to detect if you're running OpenSearch or Elasticsearch, but there is no involvement from Cloaked Search. Since these requests go directly to the search service (port 9200), we can see what's actually stored._
 

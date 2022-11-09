@@ -9,7 +9,7 @@ services:
       discovery.type: "single-node"
       xpack.security.enabled: "false"
   cloaked-search:
-    image: "gcr.io/ironcore-images/cloaked-search:2.0.0-RC1"
+    image: "gcr.io/ironcore-images/cloaked-search:2.0.0"
     ports:
       - 8675:8675
     volumes:

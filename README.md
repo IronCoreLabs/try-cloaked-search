@@ -30,13 +30,13 @@ All other commands are assumed be run from within directory where you cloned the
 _Note: This example install uses ports 9200 (Elasticsearch/OpenSearch) and 8675 (Cloaked Search). Be sure you don't have an existing search service running on port 9200 before beginning._
 
 ```bash
-docker-compose -f elastic-search/docker-compose.yml up # for elastic search
+docker-compose -f elasticsearch/docker-compose.yml up # for Elasticsearch
 ```
 
 or
 
 ```bash
-docker-compose -f open-search/docker-compose.yml up # for open search
+docker-compose -f open-search/docker-compose.yml up # for Open Search
 ```
 
 **Note: Future commands will be targeting Cloaked Search on port 8675**
@@ -52,23 +52,24 @@ To better understand Cloaked Search's key management, refer to the [configuratio
 ./populate_index.sh
 ```
 
-### (optional) Look at an encrypted index
+### (Optional) Look at an encrypted index
 
 _Note that all queries made with `./query-search-service.sh` are being made directly to your search service. We are using a script to detect if you're running OpenSearch or Elasticsearch, but there is no involvement from Cloaked Search. Since these requests go directly to the search service (port 9200), we can see what's actually stored._
 
 Let's get all the documents belonging to `tenant-1` and see what's in the index!
 
 ```bash
-./query-search-service.sh '+tenant_id:"tenant-1"' | jq
+./query-search-service.sh '+tenant_id.keyword:"tenant-1"' | jq
 ```
 
 We are protecting the `body` and `summary` fields from the original document. These fields are no longer attached to the document;
-instead, the blind index tokens for `body` and `summary` are stored in the `_icl_p_body` and `_icl_p_summary` fields, respectively.
+instead, the blind index tokens for `body` are stored in the `_icl_p_body`. Because we enabled `index_prefixes` for the `summary` field,
+it has been translated to `_icl_p_summary._value` and `_icl_p_summary._index_prefix`.
 You will also notice an `_icl_encrypted_source` field; this contains an encrypted version of the fields that have been protected, which allows Cloaked Search
 to return them to their original versions.
 
-```
-"_icl_p_summary": "7B76C95A 616544A2 B41FA81E 85933317 E30236D5 ...",
+```json
+"_icl_p_summary": "7b76c95a 616544a2 b41fa81e 85933317 e30236d5 ...",
 ```
 
 ## Querying Protected Fields
@@ -78,46 +79,55 @@ to return them to their original versions.
 These are a couple examples of simple term queries. They are still querying on the `title` field, which is unprotected.
 
 ```bash
-./query-cloaked-search.sh '+tenant_id:"tenant-1" AND title:Japan' | jq
-./query-cloaked-search.sh '+tenant_id:"tenant-1" AND title:cup' | jq
+./query-cloaked-search.sh '+tenant_id.keyword:"tenant-1" AND title:Japan' | jq
+./query-cloaked-search.sh '+tenant_id.keyword:"tenant-1" AND title:cup' | jq
 ```
 
 Compare these results to the ones returned by querying the search service directly. The same documents are returned, but the contents are very different.
 You can see how Cloaked Search transparently handles the decryption of the document to allow you to see the data in the fields that were protected, `summary` and `body`.
 
 ```bash
-./query-search-service.sh '+tenant_id:"tenant-1" AND title:Japan' | jq
-./query-search-service.sh '+tenant_id:"tenant-1" AND title:cup' | jq
+./query-search-service.sh '+tenant_id.keyword:"tenant-1" AND title:Japan' | jq
+./query-search-service.sh '+tenant_id.keyword:"tenant-1" AND title:cup' | jq
 ```
 
 Now try querying on a protected field:
 
 ```bash
-./query-cloaked-search.sh '+tenant_id:"tenant-1" AND summary:glasgow' | jq
+./query-cloaked-search.sh '+tenant_id.keyword:"tenant-1" AND summary:glasgow' | jq
 ```
 
-Term queries can also be combined with ORs or ANDs, and you can mix protected and unprotected fields. For example,
+Queries can also be combined with ORs or ANDs, and you can mix protected and unprotected fields. For example,
 
 ```bash
-./query-cloaked-search.sh '+tenant_id:"tenant-1" AND (title:cup OR title:Japan)' | jq
-./query-cloaked-search.sh '+tenant_id:"tenant-1" AND (summary:cup OR title:Japan)' | jq
-./query-cloaked-search.sh '+tenant_id:"tenant-1" AND (summary:cup OR body:Japan)' | jq
+./query-cloaked-search.sh '+tenant_id.keyword:"tenant-1" AND (title:cup OR title:Japan)' | jq
+./query-cloaked-search.sh '+tenant_id.keyword:"tenant-1" AND (summary:cup OR title:Japan)' | jq
+./query-cloaked-search.sh '+tenant_id.keyword:"tenant-1" AND (summary:cup OR body:Japan)' | jq
 ```
 
 Phrases can also be searched using quoted queries like this:
 
 ```bash
-./query-cloaked-search.sh '+tenant_id:"tenant-1" AND summary:"Cheerleading in Japan"' | jq
+./query-cloaked-search.sh '+tenant_id.keyword:"tenant-1" AND summary:"Cheerleading in Japan"' | jq
 ```
 
-Finally, here is an example of a prefix query:
+Finally, here is an example of a prefix query on the `summary` field (the field with `index_prefixes` enabled):
 
 ```bash
-./query-cloaked-search.sh '+tenant_id:"tenant-1" AND summary:pro*' | jq
+./query-cloaked-search.sh '+tenant_id.keyword:"tenant-1" AND summary:pro*' | jq
 ```
 
-You can replace the query with anything you like. Make sure you have the `+tenant_id` in the query. `populate_index.sh` loaded 1000 documents, 1/2 are tagged with `tenant-1` and the others are tagged with `tenant-2`.
-We currently support a subset of the search service's query language, but are continuing to add support.
+You can replace the query with anything you like. Make sure you have the `+tenant_id.keyword` in the query. `populate_index.sh` loaded 1000 documents, half are tagged with `tenant-1` and the others are tagged with `tenant-2`.
+
+### JSON queries
+
+Cloaked Search also supports requests other than Query String queries. For example,
+
+```bash
+./query-cloaked-search-json.sh 'japan' 'tenant-1' | jq
+```
+
+This searches for `Japan` in the protected `summary` field over all the documents belonging to `tenant-1`.
 
 ## Next Steps
 

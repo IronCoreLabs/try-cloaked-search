@@ -1,20 +1,24 @@
 version: "3.3"
 services:
   search-service:
-    image: "docker.elastic.co/elasticsearch/elasticsearch:7.13.2"
+    image: "docker.elastic.co/elasticsearch/elasticsearch:8.4.3"
     ports:
       - 9200:9200
     environment:
       ES_JAVA_OPTS: "-Xmx1G"
       discovery.type: "single-node"
+      xpack.security.enabled: "false"
   cloaked-search:
-    image: "gcr.io/ironcore-images/cloaked-search:1.0"
+    image: "gcr.io/ironcore-images/cloaked-search:2.0.0"
     ports:
       - 8675:8675
     volumes:
       - type: bind
-        source: ./try-cloaked-search-conf.yml
+        source: ../try-cloaked-search-conf.json
         target: /app/deploy.yml
       - type: bind
-        source: ../test-key
+        source: ../indices
+        target: /app/indices
+      - type: bind
+        source: ../example.key
         target: /secrets/cloaked-search/key1

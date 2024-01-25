@@ -1,7 +1,7 @@
 version: "3.3"
 services:
   search-service:
-    image: "docker.elastic.co/elasticsearch/elasticsearch:8.4.3"
+    image: "docker.elastic.co/elasticsearch/elasticsearch:8.12.0"
     ports:
       - 9200:9200
     environment:
@@ -9,7 +9,7 @@ services:
       discovery.type: "single-node"
       xpack.security.enabled: "false"
   cloaked-search:
-    image: "gcr.io/ironcore-images/cloaked-search:2.1.0"
+    image: "gcr.io/ironcore-images/cloaked-search:2.4.0"
     ports:
       - 8675:8675
     volumes:

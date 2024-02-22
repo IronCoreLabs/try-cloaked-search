@@ -1,0 +1,10 @@
+{
+  "search_service_url": "http://elasticsearch:9200",
+  "standalone_keys": [
+    {
+      "id": "primary-key",
+      "keypath": "/secrets/cloaked-search/key1",
+      "primary": true
+    }
+  ]
+}

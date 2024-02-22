@@ -16,9 +16,11 @@ generatorOptions:
 
 configMapGenerator:
   - files:
-      - config/deploy.yml
-    name: cloaked-search
-
+      - config/deploy.json
+    name: cloaked-search-config
+  - files:
+      - config/indices/try_cloaked_search.json
+    name: cloaked-search-index-config
 secretGenerator:
   - literals:
       - key1=60e0787286bf350ec4db6a89c54efea38d09238ac80fc9a1401c0291f96bd1ee
@@ -27,7 +29,7 @@ secretGenerator:
 images:
   - name: cloaked-search-placeholder
     newName: gcr.io/ironcore-images/cloaked-search
-    newTag: "1.0"
+    newTag: "2.4.3"
   - name: elasticsearch-placeholder
     newName: elasticsearch
-    newTag: "7.17.4"
+    newTag: "8.12.0"

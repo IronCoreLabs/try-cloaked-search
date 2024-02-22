@@ -1,0 +1,28 @@
+{
+  "id": "try_cloaked_search",
+  "indices": ["try_cloaked_search"],
+  "tenant_id_index_field": "tenant_id",
+  "tenant_id_search_field": "tenant_id.keyword",
+  "mappings": {
+    "properties": {
+      "body": {
+        "type": "text",
+        "index_prefixes": {},
+        "analyzer": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": ["lowercase"]
+        }
+      },
+      "summary": {
+        "type": "text",
+        "index_prefixes": {},
+        "analyzer": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": ["lowercase"]
+        }
+      }
+    }
+  }
+}

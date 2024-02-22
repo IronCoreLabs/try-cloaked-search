@@ -42,6 +42,7 @@ spec:
             subPath: deploy.json
           - name: index-config
             mountPath: /app/indices/try_cloaked_search.json
+            subPath: try_cloaked_search.json
           - name: keys
             mountPath: /secrets/cloaked-search
       securityContext:

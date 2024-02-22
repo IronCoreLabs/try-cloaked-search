@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 xargs_c='unknown'
 unamestr=`uname`
 if [[ "$unamestr" == 'Linux' ]]; then

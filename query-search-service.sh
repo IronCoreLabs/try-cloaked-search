@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 function usage () {
   echo "Makes queries to a local version of the search service."

@@ -38,8 +38,11 @@ spec:
           runAsUser: 1001
         volumeMounts:
           - name: config
-            mountPath: /app/deploy.yml
-            subPath: deploy.yml
+            mountPath: /app/deploy.json
+            subPath: deploy.json
+          - name: index-config
+            mountPath: /app/indices/try_cloaked_search.json
+            subPath: try_cloaked_search.json
           - name: keys
             mountPath: /secrets/cloaked-search
       securityContext:
@@ -47,7 +50,10 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: cloaked-search
+            name: cloaked-search-config
+        - name: index-config
+          configMap:
+            name: cloaked-search-index-config
         - name: keys
           secret:
             secretName: cloaked-search

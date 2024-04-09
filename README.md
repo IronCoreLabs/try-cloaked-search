@@ -46,7 +46,7 @@ docker-compose -f open-search/docker-compose.yml up # for Open Search
 `try-cloaked-search` includes some test data. Since Cloaked Search uses a different key per (tenant, index, field),
 documents with protected fields must be tagged with the tenant to which they belong.
 Half of the articles in the test dataset are associated with `tenant-1`, and the other half are associated with `tenant-2`.
-To better understand Cloaked Search's key management, refer to the [configuration documentation](https://ironcorelabs.com/docs/saas-shield/cloaked-search/configuration).
+To better understand Cloaked Search's key management, refer to the [configuration documentation](https://ironcorelabs.com/docs/cloaked-search/configuration/).
 
 ```bash
 ./populate_index.sh

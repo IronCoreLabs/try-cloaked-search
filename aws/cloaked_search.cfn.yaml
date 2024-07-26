@@ -307,10 +307,11 @@ Resources:
           - sh
           - -c
           - |
-            echo "${CS_CONFIG}" > /app/deploy.yml &&
+            echo "${CS_CONFIG}" > /app/deploy.json &&
             mkdir -p /secrets/cloaked-search &&
             echo "${CS_KEY1}" > /secrets/cloaked-search/key1 &&
-            exec /app/cloaked-search-proxy /app/deploy.yml
+            echo "${TRY_CS_INDEX_CONFIG}" > /app/indices/try_cloaked_search.json &&
+            exec /app/cloaked-search-proxy /app/deploy.json
           LogConfiguration:
             LogDriver: awslogs
             Options:

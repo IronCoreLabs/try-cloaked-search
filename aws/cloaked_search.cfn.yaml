@@ -255,22 +255,46 @@ Resources:
             Value: info
           - Name: CS_CONFIG
             Value: |
-              search_service_url: "http://elasticsearch.local:9200"
-              standalone_keys:
-                - id: primary-key
-                  keypath: /secrets/cloaked-search/key1
-                  primary: true
-              indices:
-                - name: try_cloaked_search
-                  fields:
-                    - name: title
-                      analyzer:
-                        tokenizer: default
-                        filters:
-                          - lowercase
-                          - terms
-                          - phrases
-                          - substring
+              {
+                "search_service_url": "http://elasticsearch.local:9200",
+                "standalone_keys": [
+                  {
+                    "id": "primary-key",
+                    "keypath": "/secrets/cloaked-search/key1",
+                    "primary": true
+                  }
+                ]
+              }
+          - Name: TRY_CS_INDEX_CONFIG
+            Value: |
+              {
+                "id": "try_cloaked_search",
+                "indices": ["try_cloaked_search"],
+                "tenant_id_index_field": "tenant_id",
+                "tenant_id_search_field": "tenant_id.keyword",
+                "mappings": {
+                  "properties": {
+                    "body": {
+                      "type": "text",
+                      "index_prefixes": {},
+                      "analyzer": {
+                        "type": "custom",
+                        "tokenizer": "standard",
+                        "filter": ["lowercase"]
+                      }
+                    },
+                    "summary": {
+                      "type": "text",
+                      "index_prefixes": {},
+                      "analyzer": {
+                        "type": "custom",
+                        "tokenizer": "standard",
+                        "filter": ["lowercase"]
+                      }
+                    }
+                  }
+                }
+              }
           Secrets:
           - Name: CS_KEY1
             ValueFrom: !Ref CSKey1
@@ -278,15 +302,17 @@ Resources:
             Command:
             - CMD-SHELL
             - wget -O /dev/null http://127.0.0.1:8675/_cloaked_search/live
-          Image: gcr.io/ironcore-images/cloaked-search:1.1.1
+          Image: gcr.io/ironcore-images/cloaked-search-aws:2.8.1
           EntryPoint:
           - sh
           - -c
           - |
-            echo "${CS_CONFIG}" > /app/deploy.yml &&
+            echo "${CS_CONFIG}" > /app/deploy.json &&
             mkdir -p /secrets/cloaked-search &&
+            mkdir -p /app/indices &&
             echo "${CS_KEY1}" > /secrets/cloaked-search/key1 &&
-            exec /app/cloaked-search-proxy /app/deploy.yml
+            echo "${TRY_CS_INDEX_CONFIG}" > /app/indices/try_cloaked_search.json &&
+            exec /app/cloaked-search-proxy /app/deploy.json
           LogConfiguration:
             LogDriver: awslogs
             Options:

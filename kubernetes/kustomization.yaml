@@ -29,7 +29,7 @@ secretGenerator:
 images:
   - name: cloaked-search-placeholder
     newName: gcr.io/ironcore-images/cloaked-search
-    newTag: "2.4.3"
+    newTag: "2.10.2"
   - name: elasticsearch-placeholder
     newName: elasticsearch
     newTag: "8.12.0"
